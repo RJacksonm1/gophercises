@@ -10,23 +10,26 @@ import (
 	"strings"
 )
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
+// Question to ask in the quiz
+type Question struct {
+	Q string
+	A string
 }
 
-func main() {
+// CheckAnswer verifies the user's answer to this question
+func (q *Question) CheckAnswer(a string) bool {
+	return strings.TrimSpace(strings.ToLower(a)) == strings.ToLower(q.A)
+}
 
-	questionsFile := flag.String("csv", "problems.csv", "The questions for the quiz. One question per row. Question first, answer second.")
-	flag.Parse()
+// Questions to ask in the quiz
+type Questions []Question
 
-	var total, right int16
-
-	f, err := os.Open(*questionsFile)
-	check(err)
-
-	userInputReader := bufio.NewReader(os.Stdin)
+// LoadQuestionsFromFile creates a new Questions from a CSV of question and answer pairs
+func LoadQuestionsFromFile(questionsFile string) (q Questions, err error) {
+	f, err := os.Open(questionsFile)
+	if err != nil {
+		return Questions{}, err
+	}
 
 	r := csv.NewReader(bufio.NewReader(f))
 	for {
@@ -34,17 +37,39 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		check(err)
-		q, a := qa[0], strings.ToLower(qa[1])
+		if err != nil {
+			return Questions{}, err
+		}
 
-		fmt.Printf("Question %d: %s\n", total+1, q)
+		q = append(q, Question{
+			Q: qa[0],
+			A: strings.TrimSpace(qa[1]),
+		})
+	}
+	return q, err
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func main() {
+	questionsFile := flag.String("csv", "problems.csv", "The questions for the quiz. One question per row. Question first, answer second.")
+	flag.Parse()
+
+	questions, err := LoadQuestionsFromFile(*questionsFile)
+	check(err)
+
+	var total, right int16
+	userInputReader := bufio.NewReader(os.Stdin)
+	for _, q := range questions {
+		fmt.Printf("Question %d: %s\n", total+1, q.Q)
 		total++
 
-		userAnswer, _ := userInputReader.ReadString('\n')
-		userAnswer = strings.TrimSpace(userAnswer)
-		userAnswer = strings.ToLower(userAnswer)
-
-		if userAnswer == a {
+		a, _ := userInputReader.ReadString('\n')
+		if q.CheckAnswer(a) {
 			right++
 		}
 	}

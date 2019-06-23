@@ -4,6 +4,8 @@ Command-line Quiz Game
 
 ```
 go run quiz
+
+go run quiz --csv=problems2.csv
 ```
 
 # Requirements
@@ -12,7 +14,7 @@ go run quiz
 
 - ✅ Interactive quiz game
 - ✅ Ask a series of questions, the questions & answered pairs being rows in a CSV
-- CSV to load is configurable; defaults to `problems.csv`
+- ✅ CSV to load is configurable; defaults to `problems.csv`
 - ✅ Keep a total of correct and incorrect answers
 - ✅ At the end of the quiz, tell the user how many questions they were asked, and how many they got right
 

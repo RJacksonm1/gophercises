@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -16,9 +17,13 @@ func check(e error) {
 }
 
 func main() {
+
+	questionsFile := flag.String("csv", "problems.csv", "The questions for the quiz. One question per row. Question first, answer second.")
+	flag.Parse()
+
 	var total, right int16
 
-	f, err := os.Open("problems.csv")
+	f, err := os.Open(*questionsFile)
 	check(err)
 
 	userInputReader := bufio.NewReader(os.Stdin)

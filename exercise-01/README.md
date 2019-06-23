@@ -5,8 +5,16 @@ Command-line Quiz Game
 ```
 go run quiz
 
-go run quiz --csv=problems2.csv
+go run quiz --limit 10 --csv problems2.csv --shuffle
 ```
+
+Flags
+
+| Flag        | Type   | Description                                                                                               |
+| ----------- | ------ | --------------------------------------------------------------------------------------------------------- |
+| `--csv`     | string | The questions for the quiz. One question per row. Question first, answer second. (default "problems.csv") |
+| `--limit`   | int    | Set a time limit on the quiz (default 30)                                                                 |
+| `--shuffle` |        | Randomise the order of the questions                                                                      |
 
 # Requirements
 
@@ -20,9 +28,9 @@ go run quiz --csv=problems2.csv
 
 ## Part 2
 
-- Add a time limit
-- Quiz terminates as soon as timer expires (don't wait for input)
-- Time limit is configurable; defaults to 30s
+- ✅ Add a time limit
+- ✅ Quiz terminates as soon as timer expires (don't wait for input)
+- ✅ Time limit is configurable; defaults to 30s
 
 ## Bonus
 

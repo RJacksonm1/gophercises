@@ -67,6 +67,7 @@ func check(e error) {
 func main() {
 	questionsFile := flag.String("csv", "problems.csv", "The questions for the quiz. One question per row. Question first, answer second.")
 	shuffle := flag.Bool("shuffle", false, "Randomise the order of the questions")
+	limit := flag.Int("limit", 30, "Set a time limit on the quiz")
 	flag.Parse()
 
 	questions, err := LoadQuestionsFromFile(*questionsFile)
@@ -77,17 +78,33 @@ func main() {
 		questions.Shuffle()
 	}
 
+	finished := make(chan bool)
+// 
+	// Ask questions
 	var total, right int16
-	userInputReader := bufio.NewReader(os.Stdin)
-	for _, q := range questions {
-		fmt.Printf("Question %d: %s\n", total+1, q.Q)
-		total++
+	go func() {
+		userInputReader := bufio.NewReader(os.Stdin)
+		for _, q := range questions {
+			fmt.Printf("Question %d: %s\n", total+1, q.Q)
+			total++
 
-		a, _ := userInputReader.ReadString('\n')
-		if q.CheckAnswer(a) {
-			right++
+			a, _ := userInputReader.ReadString('\n')
+			if q.CheckAnswer(a) {
+				right++
+			}
 		}
-	}
+// 
+		finished <- true
+	}()
 
-	fmt.Printf("You got %d out of %d questions correct!\n", right, total)
+	// Time limitt
+	go func() {
+		time.Sleep(time.Duration(*limit) * time.Second)
+		fmt.Println("\nTime's up!")
+		finished <- true
+	}()
+
+	if <-finished {
+		fmt.Printf("You got %d out of %d questions correct!\n", right, total)
+	}
 }

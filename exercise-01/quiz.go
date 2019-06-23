@@ -6,8 +6,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 // Question to ask in the quiz
@@ -49,6 +51,13 @@ func LoadQuestionsFromFile(questionsFile string) (q Questions, err error) {
 	return q, err
 }
 
+// Shuffle the order of the questions
+func (qs *Questions) Shuffle() {
+	rand.Shuffle(len(*qs), func(i, j int) {
+		(*qs)[i], (*qs)[j] = (*qs)[j], (*qs)[i]
+	})
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
@@ -57,10 +66,16 @@ func check(e error) {
 
 func main() {
 	questionsFile := flag.String("csv", "problems.csv", "The questions for the quiz. One question per row. Question first, answer second.")
+	shuffle := flag.Bool("shuffle", false, "Randomise the order of the questions")
 	flag.Parse()
 
 	questions, err := LoadQuestionsFromFile(*questionsFile)
 	check(err)
+
+	if *shuffle {
+		rand.Seed(time.Now().UnixNano())
+		questions.Shuffle()
+	}
 
 	var total, right int16
 	userInputReader := bufio.NewReader(os.Stdin)

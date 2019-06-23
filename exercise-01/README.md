@@ -28,4 +28,4 @@ go run quiz --csv=problems2.csv
 
 - ✅ Trim spaces
 - ✅ Case insensitive
-- Flag to shuffle quiz order
+- ✅ Flag to shuffle quiz order
